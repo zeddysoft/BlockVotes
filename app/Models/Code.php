@@ -46,7 +46,7 @@ class Code extends Model
                     'code' => $content,
                     'used' => '0',
                     'item_id' => $item,
-                    'user_id' => ''
+                    'user_id' => '0'
                 ]);
             }
             return $content;

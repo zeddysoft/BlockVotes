@@ -27,6 +27,7 @@ class BallotAPIController extends Controller
      *
      */
     public function postAddVoter($request, $response){
+        echo  " i love this";
         $data = array('success' => '0');
         $email = $request->getParam('email');
         $firstname = $request->getParam('firstname');
@@ -36,14 +37,15 @@ class BallotAPIController extends Controller
         $code =  new Code();
         $codeid =$code->generateCode(1,$vote_id);
 
-        $content= "Hi, " . $firstname .  "<br /><br />You are ready to vote for <strong>" .$vote_item . "</strong>  <br />Please follow this URL to sign up as a voter to vote. <br /><br />  http://localhost/vote/home?code=" . $codeid . "<br /><br />   Best,<br /><br />   The Blockvotes Team" ;
+        $content= "Hi, " . $firstname .  "<br /><br />You are ready to vote for <strong>" .$vote_item . "</strong>  <br />Please follow this URL to sign up as a voter to vote. <br /><br />  http://localhost:8082/vote/home?code=" . $codeid . "<br /><br />   Best,<br /><br />   The Blockvotes Team" ;
 
         $transport = (new \Swift_SmtpTransport( getenv('STMP_SERVER'), getenv('STMP_PORT'),'ssl'))
             ->setUsername(getenv('STMP_USERNAME'))
             ->setPassword(getenv('STMP_PASSWORD'))
         ;
+        error_log(getenv('STMP_USERNAME'));
+        error_log(getenv('STMP_PASSWORD'));
         $mailer = new \Swift_Mailer($transport);
-
         $message =(new \Swift_Message('Start your vote now'))
             ->setFrom(array(getenv('STMP_USERNAME') => 'BlockVotes Team'))
             ->setTo(array($email => 'Voter'))
@@ -70,5 +72,6 @@ class BallotAPIController extends Controller
         return $result->title;
     }
 
-
-}
+    function debugToConsole($msg) {
+     
+}   }
