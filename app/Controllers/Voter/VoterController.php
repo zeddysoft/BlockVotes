@@ -24,6 +24,7 @@ class VoterController extends Controller
     {
             $data["title"] ="";
             if ($query) {
+                //get the particular vote/election the code is associated with
                 $vote_list = VoteList::all()->where('id', $query->item_id)->first();
                 $data["title"] = $vote_list->title;
                 $data["item_id"] = $vote_list->id;

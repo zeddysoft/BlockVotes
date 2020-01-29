@@ -145,6 +145,7 @@ class PublicAPIController extends Controller
         $id =  $request->getParam('item_id');
         $query = new Code();
 
+        //get all election with item_id (sort of election id)
         $data = $query->select('public_key')->where([
             ['item_id', '=', $id],
             ['public_key', '<>', '0']

@@ -28,11 +28,13 @@ class VoteController extends Controller
     public function getDashBoard($request, $response)
     {
         $data = $this->auth->user();
+
         $data["items"] = VoteList::all()->count();
         $query = new Code();
         $data["voters"] = $query->select('public_key')->where([
             ['public_key', '<>', '0']
         ])->count();
+        error_log($data);
 
         $votelist = VoteList::all()->where('is_started','1');
 
@@ -75,7 +77,7 @@ class VoteController extends Controller
      */
     public function postVote($request,$response)
     {
-
+        error_log(" new election is about to be added");
         $validation = $this->validator->validate($request,[
             'title' => v::notEmpty(),
             'number' => v::noWhitespace()->positive()

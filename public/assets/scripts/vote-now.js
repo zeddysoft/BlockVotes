@@ -124,15 +124,20 @@ function fetchBitcoinPrivateKey(){
             network = Bitcoin.networks.testnet;
             keyPair = Bitcoin.ECPair.fromWIF(wif,network);
             bitcoinAddress = keyPair.getAddress();
-            $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
+            $.getJSON("http://demo9955690.mockable.io/get_tx_unspent",function(result){
+                // $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
                 var txb = new Bitcoin.TransactionBuilder(network);
 
-                var last = result.data.txs.length - 1;
-                unspent_txid = result.data.txs[last].txid;
-                unspent_vout = result.data.txs[last].output_no;
+                // var last = result.data.txs.length - 1;
+                // unspent_txid = result.data.txs[last].txid;
+                unspent_txid = "9d80667769d23fd9d5e29903dc821961ccbe7de0db14e2dae9fa6d809c86b779";
+                // unspent_vout = result.data.txs[last].output_no;
+                unspent_vout = 0;
                 txb.addInput(unspent_txid, unspent_vout);
-                value = Number(result.data.txs[last].value * 100000000);
-                address = $(".eaaddress").val();
+                // value = Number(result.data.txs[last].value * 100000000);
+                value = Number(90.0 * 100000000);
+               // address = $(".eaaddress").val(); //use static address for now morSbkvxCANnTAG2X9RJkzjMUfTKyyUisx
+                address = "morSbkvxCANnTAG2X9RJkzjMUfTKyyUisx";
                 // address = 'n4Kc1AwFos3aZRvD3Tc9imzeMeA8E9DEUr';
                 pay = 0.01 * 100000000;
                 fee = 0.01 * 100000000;

@@ -9,7 +9,6 @@ $(document).ready(function() {
 
     $(".btn-start-vote").on('click', function() {
         var voteid = $(".vote-candidate").val();
-
         if(voteid){
             swal({
                     title: "Are you sure?",

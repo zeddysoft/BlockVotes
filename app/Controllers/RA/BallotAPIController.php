@@ -27,7 +27,7 @@ class BallotAPIController extends Controller
      *
      */
     public function postAddVoter($request, $response){
-        echo  " i love this";
+
         $data = array('success' => '0');
         $email = $request->getParam('email');
         $firstname = $request->getParam('firstname');
