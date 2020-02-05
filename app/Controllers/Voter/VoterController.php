@@ -33,6 +33,7 @@ class VoterController extends Controller
                 $data["is_started"] =$vote_list->is_started;
                 $data["description"] =$vote_list->description;
             }
+            error_log(print_r($data,true));
             return $data;
 
     }

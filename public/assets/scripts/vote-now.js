@@ -124,27 +124,35 @@ function fetchBitcoinPrivateKey(){
             network = Bitcoin.networks.testnet;
             keyPair = Bitcoin.ECPair.fromWIF(wif,network);
             bitcoinAddress = keyPair.getAddress();
-            $.getJSON("http://demo9955690.mockable.io/get_tx_unspent",function(result){
-                // $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
+            console.log(`kc pair address: ${keyPair.getAddress()}`);
+            // bitcoinAddress = result.content.bitcoin_address;
+            console.log(`saved address: ${bitcoinAddress}`);
+
+            console.log(`address in question is: ${bitcoinAddress}`);
+                $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
                 var txb = new Bitcoin.TransactionBuilder(network);
 
-                // var last = result.data.txs.length - 1;
-                // unspent_txid = result.data.txs[last].txid;
-                unspent_txid = "9d80667769d23fd9d5e29903dc821961ccbe7de0db14e2dae9fa6d809c86b779";
-                // unspent_vout = result.data.txs[last].output_no;
-                unspent_vout = 0;
+                console.log(`result of ${bitcoinAddress} is: ${result}`);
+                var last = result.data.txs.length - 1;
+                console.log(`last is: ${last}`);
+                unspent_txid = result.data.txs[last].txid;
+                unspent_vout = result.data.txs[last].output_no;
                 txb.addInput(unspent_txid, unspent_vout);
-                // value = Number(result.data.txs[last].value * 100000000);
-                value = Number(90.0 * 100000000);
-               // address = $(".eaaddress").val(); //use static address for now morSbkvxCANnTAG2X9RJkzjMUfTKyyUisx
-                address = "morSbkvxCANnTAG2X9RJkzjMUfTKyyUisx";
+                value = Number(result.data.txs[last].value * 100000000);
+               // address = $(".eaaddress").val(); //use static address for now morSbkvxCANnTAG2X9RJkzjMUfTKyyUisx;
+                    address = "n4Kc1AwFos3aZRvD3Tc9imzeMeA8E9DEUr";
+                    console.log(`sending money to address: ${address}`);
                 // address = 'n4Kc1AwFos3aZRvD3Tc9imzeMeA8E9DEUr';
-                pay = 0.01 * 100000000;
-                fee = 0.01 * 100000000;
+                pay = 0.00001 * 100000000; //amount to reserve in wallet
+                //fee = 0.01 * 100000000;//
+                fee = 0.0001 * 100000000;
                 change = parseInt(value - pay - fee);
+                console.log(`amount to pay is: ${change}`);
 
-                console.log(value);
+                console.log(`original value is ${value}`);
 
+                console.log(`candidate ${candidate} - item id ${item_id}`);
+                console.log(`buffered data: ${hashSig + padding(candidate, 3) + padding(item_id, 3)}`);
                 var commit = new Buffered(hashSig +padding(candidate,3) + padding(item_id,3));
                 var dataScript = Bitcoin.script.nullData.output.encode(commit);
 
@@ -157,11 +165,12 @@ function fetchBitcoinPrivateKey(){
                 var txHex = txRaw.toHex();
 
                 console.log('hex',txHex);
-                postdata = { tx_hex : txHex };
-                $.post("https://chain.so/api/v2/send_tx/BTCTEST/",postdata,function(result){
-                    showCMD(step,result.status);
-                    showCMD(step,result.data.txid);
-                    window.open("https://www.blocktrail.com/tBTC/tx/"+result.data.txid);
+                postdata = { rawtx : txHex };
+                $.post("https://testnet.blockexplorer.com/api/tx/send",postdata,function(result){
+                    console.log(`success result ${result}`);
+                    showCMD(step,"success");
+                    showCMD(step,result.txid);
+                    window.open("https://testnet.blockexplorer.com/tx/"+result.txid);
                 });
             });
 

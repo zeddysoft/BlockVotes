@@ -145,14 +145,15 @@ class PublicAPIController extends Controller
         $id =  $request->getParam('item_id');
         $query = new Code();
 
-        //get all election with item_id (sort of election id)
+        //get all election with item_id (sort of election id) for which user have saved public keys
         $data = $query->select('public_key')->where([
             ['item_id', '=', $id],
             ['public_key', '<>', '0']
         ]);
 
-        if($code =  $request->getParam('code'))
+        if($code =  $request->getParam('code')){
             $data = $data->where('code', '<>', $code);
+        }
 
         return $this->generateJson($response, '1',$data->get());
 
@@ -165,6 +166,7 @@ class PublicAPIController extends Controller
      */
     public function getBitCoinPriv($request, $response){
         $id =  $request->getParam('bitcoin_address');
+        error_log("id is: ".$id);
         $data = Key::select('id','bitcoin_address','bitcoin_private_key','bitcoin_public_key')->where('id',$id);
         if($data->where('is_used','0')->count()>0){
             $code =  new Code();

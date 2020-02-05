@@ -8,6 +8,7 @@ $(document).ready(function() {
     $(".btn-email").on('click', function() {
         swal('Waiting','Please wait, sending email now','info');
         $.getJSON("/api/addvoter",{"email":$(".voter-email").val(),"vote_id":$(".vote-id").val()},function(result){
+            console.log(`result is ${result}`);
             if(result.success == 1){
                 swal("Good job!", "Send an email to the voter successfully!", "success");
                 $(".voter-email").val("");

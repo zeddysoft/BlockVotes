@@ -32,8 +32,8 @@ class Code extends Model
     }
 
     /**
-     * @param $number
-     * @param $item
+     * @param $number always 1
+     * @param $item vote id
      * @return bool|string
      */
     public function generateCode($number,$item)

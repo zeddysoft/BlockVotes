@@ -3,20 +3,19 @@
  * @author  Yifan Wu
  */
 $(document).ready(function() {
-    $.getJSON("https://chain.so/api/v2/get_address_balance/BTCTEST/"+$(".bitcoin-address").val(),function(result){
-        if(result.status === "success"){
-            $(".number-btc").html(result.data.confirmed_balance.slice(0,6));
-            $(".number-network").html(result.data.network);
-
+    $.getJSON("https://testnet.blockexplorer.com/api/addr/"+$(".bitcoin-address").val() + "/balance",function(result){
+        if(result){
+            $(".number-btc").html(result/100000000);
+            $(".number-network").html('BTCTEST');
         }else{
             $(".number-btc").html("Unconfigured");
             $(".number-network").html("Unconfigured");
 
         }
     });
-    $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+$(".bitcoin-address").val(),function(result) {
-        if(result.status === "success"){
-            $(".number-unspent").html(result.data.txs.length);
+    $.getJSON("https://testnet.blockexplorer.com/api/addr/"+$(".bitcoin-address").val() + "/utxo",function(result) {
+        if(result){
+            $(".number-unspent").html(result.length);
 
         }else{
             $(".number-unspent").html("Unconfigured");
@@ -70,9 +69,10 @@ function loadBlockchain(id){
 
 
 function getPubKeysHash(id){
+    console.log(`getting public key hash`);
     var data = {item_id:id};
     pubkeyhash = [];
-    $.getJSON("http://localhost/api/publickey",data,function(result){
+    $.getJSON("http://localhost:8080/api/publickey",data,function(result){
         if(result.success ==="1"){
             $(result.content).each(function (i,item) {
                 pubkeyhash.push(Sha1.hash(item.public_key));
@@ -111,12 +111,16 @@ function payBitcoin(){
 }
 
 function makeTransaction(itemid,address,pbhash){
+    console.log(`pb hash ${pbhash}`);
     if(!lock){
-        $.getJSON("https://chain.so/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
+        $.getJSON("https://sochain.com/api/v2/get_tx_unspent/BTCTEST/"+bitcoinAddress,function(result){
             lock =true;
+            console.log(result);
+            console.log(`From address: ${bitcoinAddress}`);
             var last = result.data.txs.length - 1;
             console.log('Current:' + last + ' ' + address);
             var unspent_txid = result.data.txs[last].txid;
+            console.log(`unspent txid ${unspent_txid}`);
 
             var unspent_vout = result.data.txs[last].output_no;
             txb = new Bitcoin.TransactionBuilder(network);
@@ -124,9 +128,13 @@ function makeTransaction(itemid,address,pbhash){
             txb.addInput(unspent_txid, unspent_vout);
 
             value = Number(result.data.txs[last].value * 100000000);
+            console.log(`value before ${result.data.txs[last].value}`);
+            console.log(`value is: ${value}`);
+
 
             pay = 0.0001 * 100000000;
             change = parseInt(value - pay);
+            console.log(`amount i am sending ${change}`);
 
             var commit = new Buffered(pbhash);
 
@@ -140,7 +148,8 @@ function makeTransaction(itemid,address,pbhash){
             var txRaw = txb.build();
             var txHex = txRaw.toHex();
             console.log('hex',txHex);
-            postdata = { tx_hex : txHex };
+            // postdata = { tx_hex : txHex };
+            postdata = { rawtx : txHex };
             postTransaction(itemid,postdata);
         });
         return true;
@@ -149,10 +158,13 @@ function makeTransaction(itemid,address,pbhash){
 }
 
 function postTransaction(itemid,postdata){
-    $.post("https://chain.so/api/v2/send_tx/BTCTEST/",postdata,function(result){
-        if(result.status ==="success"){
-            $(".status-"+ itemid ).html(result.data.txid);
-        }
+    $.post("https://testnet.blockexplorer.com/api/tx/send",postdata,function(result){
+    // $.post("https://chain.so/api/v2/send_tx/BTCTEST/",postdata,function(result){
+    //     if(result){
+        console.log('done');
+            console.log(`result is: ${result}`);
+            $(".status-"+ itemid ).html(result.txid);
+        // }
         lock = false;
     });
 }

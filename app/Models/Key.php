@@ -25,6 +25,7 @@ class Key extends Model
         'used_for'
     ];
 
+    //$item_id here is the vote id that identifies an election
     public function generateBitcoin($numbers,$item_id){
         $bitcoinECDSA = new BitcoinECDSA();
         $bitcoinECDSA->setNetworkPrefix('6f'); //testnet
